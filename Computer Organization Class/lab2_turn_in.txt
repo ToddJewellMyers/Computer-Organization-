@@ -1,0 +1,259 @@
+Name: Todd J Myers 
+Date: 2/3/21
+
+
+
+1.  First password: leafed
+
+2.  First password starting memory address: x3093
+
+3.  First password ending memory address (address of last character,
+    not of a null if null terminated): x3098
+
+
+
+4.  Second password: rune
+
+5.  Second password starting memory address: #3042
+
+6.  Second password ending memory address (address of last character,
+    not of a null if null terminated): #3045
+
+
+
+
+7.  What operations were performed on the characters of the second
+    password to convert it from its original form to the one appearing
+    in memory (encrypt it): its encrypted from the begiining by having the values
+    shifted 12 places and is only changed by the loop in x3022 to give the correct 
+    value 
+
+8.  What operations does the program perform on the characters of the
+    second password in memory to convert them back into their original
+    form (decrypt them):  its looping through on x3022 and adding 12 to each 
+    changing the value in each placeholder till it spells rune 
+
+9.  What is the starting address of the block which decrypts the
+    second password (note that a block is more than one instruction): x3022
+
+
+10. What is the ending address of the block which decrypts the second
+    password: x3028
+
+
+
+Annotated code:
+
+
+Memory:
+
+; grabs the phrase " Enter Password followed by Enter:"
+x3000  0101110110100000  x5DA0            AND    R6, R6, #0     
+x3001  1110001001000110  xE246            LEA    R1, x3048 
+
+; Prompts the user for the password
+x3002  0110000001000000  x6040            LDR    R0, R1, #0     
+x3003  0000010000000011  x0403            BRZ    x3007          
+x3004  1111000000100001  xF021            TRAP   OUT            
+x3005  0001001001100001  x1261            ADD    R1, R1, #1     
+x3006  0000111111111011  x0FFB            BRNZP  x3002   
+
+; Initialize R0 to zero and put pointer to the place where 
+; we will store the user entered password in R1
+x3007  0101000000100000  x5020            AND    R0, R0, #0     
+x3008  1110001010011101  xE29D            LEA    R1, x30A6 
+
+; Allows the user to enter each character, stores the character
+; in memory at x30A6, using R1 as a pointer compare each character 
+; with newline (x000A)
+x3009  1111000000100000  xF020            TRAP   GETC 
+x300A  1111000000100001  xF021            TRAP   OUT            
+x300B  0111000001000000  x7040            STR    R0, R1, #0     
+x300C  0001001001100001  x1261            ADD    R1, R1, #1     
+x300D  0010010000111001  x2439            LD     R2, x3047      
+x300E  1001010010111111  x94BF            NOT    R2, R2         
+x300F  0101010010000000  x5480            AND    R2, R2, R0     
+x3010  0000101111111000  x0BF8            BRNP   x3009    
+x3011  0001001001111111  x127F            ADD    R1, R1, #-1    
+x3012  0111010001000000  x7440            STR    R2, R1, #0     
+x3013  1110001010010010  xE292            LEA    R1, x30A6      
+x3014  1110010001111110  xE47E            LEA    R2, x3093   
+x3015  0001110110100000  x1DA0            ADD    R6, R6, #0     
+x3016  0000001000001011  x020B            BRP    x3022   ; sends to 
+
+; loops through to make sure the word entered matches the password stored and
+; compares what has been entered starting at #30A6
+x3017  0110011001000000  x6640            LDR    R3, R1, #0     
+x3018  0110100010000000  x6880            LDR    R4, R2, #0    * 
+x3019  1001100100111111  x993F            NOT    R4, R4         
+x301A  0001100100100001  x1921            ADD    R4, R4, #1     
+x301B  0001100011000100  x18C4            ADD    R4, R3, R4     
+x301C  0000101000010110  x0A16            BRNP   x3033          ; sends to explosion
+x301D  0001011011100000  x16E0            ADD    R3, R3, #0     
+x301E  0000010000001100  x040C            BRZ    x302B   ; goes to accept password          
+x301F  0001001001100001  x1261            ADD    R1, R1, #1     
+x3020  0001010010100001  x14A1            ADD    R2, R2, #1     
+x3021  0000111111110101  x0FF5            BRNZP  x3017     
+
+; loops through fibY adding 12 to each position in ot he word ruin R0 is used as 
+; placeholder for the decrypted password which is rune 
+x3022  1110010000011111  xE41F            LEA    R2, x3042      ;fibY
+x3023  0110000010000000  x6080            LDR    R0, R2, #0     
+x3024  0000010000000100  x0404            BRZ    x3029          
+x3025  0001000000101100  x102C            ADD    R0, R0, #12    
+x3026  0111000010000000  x7080            STR    R0, R2, #0     
+x3027  0001010010100001  x14A1            ADD    R2, R2, #1     
+x3028  0000111111111010  x0FFA            BRNZP  x3023    
+x3029  1110010000011000  xE418            LEA    R2, x3042      ;fibY
+x302A  0000111111101100  x0FEC            BRNZP  x3017 
+
+; password accepted and now runs through the phrase and printing to the screen 
+; "Password Accepted!"
+x302B  1110001001000100  xE244            LEA    R1, x3070      ; accepts call 
+x302C  0110000001000000  x6040            LDR    R0, R1, #0   
+x302D  0000010000000011  x0403            BRZ    x3031          
+x302E  1111000000100001  xF021            TRAP   OUT            
+x302F  0001001001100001  x1261            ADD    R1, R1, #1     
+x3030  0000111111111011  x0FFB            BRNZP  x302C 
+x3031  0101000000100000  x5020            AND    R0, R0, #0     
+x3032  0000111000001000  x0E08            BRNZP  x303B   
+
+; failure explosion occurs 
+x3033  1110001000110110  xE236            LEA    R1, x306A      ; Boom called  
+x3034  0110000001000000  x6040            LDR    R0, R1, #0     
+x3035  0000010000000011  x0403            BRZ    x3039          
+x3036  1111000000100001  xF021            TRAP   OUT 
+
+x3037  0001001001100001  x1261            ADD    R1, R1, #1     
+x3038  0000111111111011  x0FFB            BRNZP  x3034          
+x3039  0101000000100000  x5020            AND    R0, R0, #0     
+x303A  1111000000100101  xF025            TRAP   HALT  
+
+; loops out bomb diffused and checks for both password are entered 
+x303B  0001110110100000  x1DA0            ADD    R6, R6, #0     
+x303C  0000001000000010  x0202            BRP    x303F          
+x303D  0001110110100001  x1DA1            ADD    R6, R6, #1     
+x303E  0000111111000010  x0FC2            BRNZP  x3001   
+x303F  1110000001000100  xE044            LEA    R0, x3084      ; bomb diffused called
+x3040  1111000000100010  xF022            TRAP   PUTS           
+x3041  1111000000100101  xF025            TRAP   HALT  
+
+; spells "fibY"
+x3042  0000000001100110  x0066            NOP                   
+x3043  0000000001101001  x0069            NOP                   
+x3044  0000000001100010  x0062            NOP                   
+x3045  0000000001011001  x0059            NOP                   
+x3046  0000000000000000  x0000            NOP                   
+x3047  0000000000001010  x000A            NOP 
+
+; spells "Enter Password followed by Enter:
+x3048  0000000001000101  x0045            NOP                   
+x3049  0000000001101110  x006E            NOP                   
+x304A  0000000001110100  x0074            NOP                   
+x304B  0000000001100101  x0065            NOP                   
+x304C  0000000001110010  x0072            NOP                   
+x304D  0000000000100000  x0020            NOP                   
+x304E  0000000001010000  x0050            NOP                   
+x304F  0000000001100001  x0061            NOP                   
+x3050  0000000001110011  x0073            NOP                   
+x3051  0000000001110011  x0073            NOP                   
+x3052  0000000001110111  x0077            NOP                   
+x3053  0000000001101111  x006F            NOP                   
+x3054  0000000001110010  x0072            NOP                   
+x3055  0000000001100100  x0064            NOP                   
+x3056  0000000000100000  x0020            NOP                   
+x3057  0000000001100110  x0066            NOP                   
+x3058  0000000001101111  x006F            NOP                   
+x3059  0000000001101100  x006C            NOP                   
+x305A  0000000001101100  x006C            NOP                   
+x305B  0000000001101111  x006F            NOP                   
+x305C  0000000001110111  x0077            NOP                   
+x305D  0000000001100101  x0065            NOP                   
+x305E  0000000001100100  x0064            NOP                   
+x305F  0000000000100000  x0020            NOP                   
+x3060  0000000001100010  x0062            NOP                   
+x3061  0000000001111001  x0079            NOP                   
+x3062  0000000000100000  x0020            NOP                   
+x3063  0000000001000101  x0045            NOP                   
+x3064  0000000001101110  x006E            NOP                   
+x3065  0000000001110100  x0074            NOP                   
+x3066  0000000001100101  x0065            NOP                   
+x3067  0000000001110010  x0072            NOP                   
+x3068  0000000000111010  x003A            NOP  
+x3069  0000000000000000  x0000            NOP   
+
+; spells "Boom!"
+x306A  0000000001000010  x0042            NOP                   
+x306B  0000000001101111  x006F            NOP                   
+x306C  0000000001101111  x006F            NOP                   
+x306D  0000000001101101  x006D            NOP                   
+x306E  0000000000100001  x0021            NOP                   
+x306F  0000000000000000  x0000            NOP  
+
+; spells "Password Accepted!"
+x3070  0000000001010000  x0050            NOP                   
+x3071  0000000001100001  x0061            NOP                   
+x3072  0000000001110011  x0073            NOP                   
+x3073  0000000001110011  x0073            NOP                   
+x3074  0000000001110111  x0077            NOP                   
+x3075  0000000001101111  x006F            NOP                   
+x3076  0000000001110010  x0072            NOP                   
+x3077  0000000001100100  x0064            NOP                   
+x3078  0000000000100000  x0020            NOP                   
+x3079  0000000001000001  x0041            NOP                   
+x307A  0000000001100011  x0063            NOP                   
+x307B  0000000001100011  x0063            NOP                   
+x307C  0000000001100101  x0065            NOP                   
+x307D  0000000001110000  x0070            NOP                   
+x307E  0000000001110100  x0074            NOP                   
+x307F  0000000001100101  x0065            NOP                   
+x3080  0000000001100100  x0064            NOP                   
+x3081  0000000000100001  x0021            NOP                   
+x3082  0000000000001010  x000A            NOP                   
+x3083  0000000000000000  x0000            NOP  
+
+; spells "Bomb diffused." 
+x3084  0000000001000010  x0042            NOP                   
+x3085  0000000001101111  x006F            NOP                   
+x3086  0000000001101101  x006D            NOP                   
+x3087  0000000001100010  x0062            NOP                   
+x3088  0000000000100000  x0020            NOP                   
+x3089  0000000001100100  x0064            NOP                   
+x308A  0000000001100101  x0065            NOP                   
+x308B  0000000001100110  x0066            NOP                   
+x308C  0000000001110101  x0075            NOP                   
+x308D  0000000001110011  x0073            NOP                   
+x308E  0000000001100101  x0065            NOP                   
+x308F  0000000001100100  x0064            NOP                   
+x3090  0000000000101110  x002E            NOP                   
+x3091  0000000000001010  x000A            NOP                   
+x3092  0000000000000000  x0000            NOP  
+
+; This is where the first password is stored to be verified for access "leafed"
+x3093  0000000001101100  x006C            NOP                   
+x3094  0000000001100101  x0065            NOP                   
+x3095  0000000001100001  x0061            NOP                   
+x3096  0000000001100110  x0066            NOP                   
+x3097  0000000001100101  x0065            NOP                   
+x3098  0000000001100100  x0064            NOP                   
+x3099  0000000000000000  x0000            NOP  
+
+; spells "SuperSecret"
+x309A  0000000001010011  x0053            NOP                   
+x309B  0000000001110101  x0075            NOP                   
+x309C  0000000001110000  x0070            NOP                   
+x309D  0000000001100101  x0065            NOP                   
+x309E  0000000001110010  x0072            NOP                   
+x309F  0000000001010011  x0053            NOP                   
+x30A0  0000000001100101  x0065            NOP                   
+x30A1  0000000001100011  x0063            NOP                   
+x30A2  0000000001110010  x0072            NOP                   
+x30A3  0000000001100101  x0065            NOP                   
+x30A4  0000000001110100  x0074            NOP                   
+x30A5  0000000000000000  x0000            NOP 
+
+; This stores the enter password from user to be verified
+x30A6  0000000000000000  x0000            NOP                   
+x30A7  0000000000000000  x0000            NOP                   
+         
+                  

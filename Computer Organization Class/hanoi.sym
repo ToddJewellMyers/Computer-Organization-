@@ -1,0 +1,14 @@
+//Symbol Name		Page Address
+//----------------	------------
+//	DISKS                   302E
+//	ENTER                   309A
+//	GUIDE1                  3040
+//	GUIDE2                  3057
+//	GUIDE3                  3076
+//	GUIDE4                  3082
+//	GUIDE5                  308F
+//	MAIN                    3000
+//	MOVE                    30B3
+//	MOVEDISK                309B
+//	QUE                     3018
+//	STACKBASE               3017

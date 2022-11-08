@@ -1,0 +1,12 @@
+//Symbol Name		Page Address
+//----------------	------------
+//	ASCII1                  4022
+//	ASCII2                  4023
+//	END                     4012
+//	FINAL                   401A
+//	FOUR                    4024
+//	GRTTHAN                 400F
+//	LOOP                    4004
+//	LSTHAN                  400E
+//	PRINTX                  4020
+//	SAVER7                  401F
